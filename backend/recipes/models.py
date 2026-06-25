@@ -1,76 +1,32 @@
-# This is an auto-generated Django model module.
-# You'll have to do the following manually to clean this up:
-#   * Rearrange models' order
-#   * Make sure each model has one field with primary_key=True
-#   * Make sure each ForeignKey and OneToOneField has `on_delete` set to the desired behavior
-#   * Remove `managed = False` lines if you wish to allow Django to create, modify, and delete the table
-# Feel free to rename the models, but don't rename db_table values or field names.
 from django.db import models
+from ingredients.models import Ingredient
 
-
-class GroceryList(models.Model):
-    name = models.TextField()
-    user = models.ForeignKey('Users', models.DO_NOTHING)
-    created_at = models.DateTimeField()
-
-    class Meta:
-        managed = False
-        db_table = 'grocery_list'
-
-
-class GroceryListItem(models.Model):
-    grocery_list = models.ForeignKey(GroceryList, models.DO_NOTHING)
-    ingredient = models.ForeignKey('Ingredient', models.DO_NOTHING)
-    quantity = models.DecimalField(max_digits=10, decimal_places=5)  # max_digits and decimal_places have been guessed, as this database handles decimal fields as float
-    unit = models.TextField()
-    from_recipe = models.ForeignKey('Recipe', models.DO_NOTHING, blank=True, null=True)
-
-    class Meta:
-        managed = False
-        db_table = 'grocery_list_item'
-
-
-class GroceryListRecipe(models.Model):
-    grocery_list = models.ForeignKey(GroceryList, models.DO_NOTHING)
-    recipe = models.ForeignKey('Recipe', models.DO_NOTHING)
-
-    class Meta:
-        managed = False
-        db_table = 'grocery_list_recipe'
-
-
-class Ingredient(models.Model):
-    name = models.TextField()
-
-    class Meta:
-        managed = False
-        db_table = 'ingredient'
-
-
+# Create your models here.
 class Recipe(models.Model):
-    title = models.TextField()
-    user = models.ForeignKey('Users', models.DO_NOTHING)
+    name = models.CharField(max_length=255)
+    description = models.TextField(blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
 
-    class Meta:
-        managed = False
-        db_table = 'recipe'
-
+    def __str__(self):
+        return self.name
+    
 
 class RecipeIngredient(models.Model):
-    recipe = models.ForeignKey(Recipe, models.DO_NOTHING)
-    ingredient = models.ForeignKey(Ingredient, models.DO_NOTHING)
-    quantity = models.DecimalField(max_digits=10, decimal_places=5)  # max_digits and decimal_places have been guessed, as this database handles decimal fields as float
-    unit = models.TextField()
+    recipe = models.ForeignKey(
+        Recipe,
+        on_delete=models.CASCADE,
+        related_name="recipe_ingredients"
+    )
+    ingredient = models.ForeignKey(
+        Ingredient,
+        on_delete=models.CASCADE,
+        related_name="ingredient_recipes"
+    )
+    quantity = models.FloatField()
+    unit = models.CharField(max_length=50, blank=True)
 
     class Meta:
-        managed = False
-        db_table = 'recipe_ingredient'
+        unique_together = ("recipe", "ingredient")
 
-
-class Users(models.Model):
-    username = models.TextField(unique=True)
-    password = models.TextField()
-
-    class Meta:
-        managed = False
-        db_table = 'users'
+    def __str__(self):
+        return f"{self.quantity} {self.unit} {self.ingredient.name} for {self.recipe.name}"
