@@ -1,7 +1,10 @@
 from django.urls import path
-from .views import RecipeListCreateView, RecipeIngredientListCreateView
+from rest_framework.routers import DefaultRouter
+from .views import RecipeIngredientViewSet, RecipeViewSet
 
-urlpatterns = [
-    path("recipes/", RecipeListCreateView.as_view(), name="recipe-list-create"),
-    path("recipe-ingredients/", RecipeIngredientListCreateView.as_view(), name="recipe-ingredient-list-create"),
-]
+router = DefaultRouter()
+router.register(r"recipes", RecipeViewSet)
+router.register(r"recipe-ingredients", RecipeIngredientViewSet)
+
+
+urlpatterns = router.urls
