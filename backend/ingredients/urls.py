@@ -1,6 +1,8 @@
 from django.urls import path 
-from .views import IngredientListCreateView
+from rest_framework.routers import DefaultRouter
+from .views import IngredientViewSet
 
-urlpatterns = [
-    path("ingredients/", IngredientListCreateView.as_view()),
-]
+router = DefaultRouter()
+router.register(r"ingredients", IngredientViewSet)
+
+urlpatterns = router.urls
