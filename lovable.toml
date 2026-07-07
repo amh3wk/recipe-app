@@ -1,4 +1,0 @@
-[run]
-dev = "npm --prefix frontend run dev -- --port 8080"
-build = "npm --prefix frontend run build"
-"build:dev" = "npm --prefix frontend run build:dev"

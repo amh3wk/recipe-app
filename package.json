@@ -1,0 +1,12 @@
+{
+  "name": "root",
+  "private": true,
+  "scripts": {
+    "dev": "npm --prefix frontend run dev -- --port 8080",
+    "build": "npm --prefix frontend run build",
+    "build:dev": "npm --prefix frontend run build:dev",
+    "lint": "npm --prefix frontend run lint",
+    "preview": "npm --prefix frontend run preview",
+    "postinstall": "npm --prefix frontend install"
+  }
+}
