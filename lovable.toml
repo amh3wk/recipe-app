@@ -1,2 +1,2 @@
 [run]
-dev = "cd frontend && npm run dev"
+dev = "npm --prefix frontend run dev"
