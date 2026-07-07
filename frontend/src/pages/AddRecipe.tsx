@@ -8,6 +8,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Plus, X, Camera, Clock, Users } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { useRecipes } from "@/lib/store";
 
 const AddRecipe = () => {
   const [title, setTitle] = useState("");
@@ -21,6 +22,7 @@ const AddRecipe = () => {
   
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { addRecipe } = useRecipes();
 
   const addIngredient = () => {
     if (newIngredient.trim()) {
@@ -58,20 +60,13 @@ const AddRecipe = () => {
       return;
     }
 
-    // In a real app, this would save to a database
-    const newRecipe = {
-      id: Date.now(),
+    addRecipe({
       title,
       description,
-      instructions,
-      cookTime,
-      servings: parseInt(servings) || 1,
-      ingredients: ingredients.map(ing => ing.name),
-      createdAt: new Date().toISOString(),
-    };
-    
-    console.log("New recipe:", newRecipe);
-    
+      ingredients: ingredients.map((ing) => ing.name),
+      image: "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=300&h=200&fit=crop",
+    });
+
     toast({
       title: "Recipe saved!",
       description: "Your recipe has been added to your collection.",

@@ -2,111 +2,124 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Badge } from "@/components/ui/badge";
-import { Plus, Trash2, ShoppingCart, Calendar } from "lucide-react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { Trash2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { useGroceries, useRecipes } from "@/lib/store";
 
-interface GroceryItem {
-  id: number;
-  name: string;
-  quantity: string;
-  purchased: boolean;
-  fromRecipe?: string;
-}
+const recipeSuggestions = [
+  { id: 1, name: "Pasta Primavera", image: "https://images.unsplash.com/photo-1563379091339-03246963d96c?w=100&h=100&fit=crop" },
+  { id: 2, name: "Caesar Salad", image: "https://images.unsplash.com/photo-1546793665-c74683f339c1?w=100&h=100&fit=crop" },
+  { id: 3, name: "Grilled Fish", image: "https://images.unsplash.com/photo-1559847844-d826dec4ca58?w=100&h=100&fit=crop" },
+];
 
 const GroceryList = () => {
-  const [items, setItems] = useState<GroceryItem[]>([
-    { id: 1, name: "Tomatoes", quantity: "2 lbs", purchased: false, fromRecipe: "Mediterranean Pasta Salad" },
-    { id: 2, name: "Olive Oil", quantity: "1 bottle", purchased: true },
-    { id: 3, name: "Feta Cheese", quantity: "200g", purchased: false, fromRecipe: "Mediterranean Pasta Salad" },
-    { id: 4, name: "Bread", quantity: "1 loaf", purchased: false },
-  ]);
-  
-  const [newItemName, setNewItemName] = useState("");
-  const [newItemQuantity, setNewItemQuantity] = useState("");
+  const { items, addItem, toggle, remove } = useGroceries();
+  const { recipes } = useRecipes();
+  const [open, setOpen] = useState(false);
+  const [newName, setNewName] = useState("");
   const { toast } = useToast();
 
-  const addItem = () => {
-    if (newItemName.trim()) {
-      const newItem: GroceryItem = {
-        id: Date.now(),
-        name: newItemName.trim(),
-        quantity: newItemQuantity.trim() || "1",
-        purchased: false,
-      };
-      setItems([...items, newItem]);
-      setNewItemName("");
-      setNewItemQuantity("");
-      
-      toast({
-        title: "Item added",
-        description: `${newItem.name} has been added to your grocery list.`,
-      });
-    }
+  const handleAdd = () => {
+    if (!newName.trim()) return;
+    addItem(newName);
+    toast({ title: "Item added", description: `${newName} added to your list.` });
+    setNewName("");
+    setOpen(false);
   };
-
-  const togglePurchased = (id: number) => {
-    setItems(items.map(item => 
-      item.id === id ? { ...item, purchased: !item.purchased } : item
-    ));
-  };
-
-  const removeItem = (id: number) => {
-    setItems(items.filter(item => item.id !== id));
-    toast({
-      title: "Item removed",
-      description: "Item has been removed from your grocery list.",
-    });
-  };
-
-  const completedItems = items.filter(item => item.purchased);
-  const pendingItems = items.filter(item => !item.purchased);
-  const totalItems = items.length;
-  const completedCount = completedItems.length;
 
   return (
-    <div className="container mx-auto px-4 py-6 pb-20">
+    <div className="container mx-auto px-4 py-6 pb-32 max-w-2xl">
       <h1 className="text-2xl font-bold mb-2">Grocery List</h1>
       <h2 className="text-lg font-medium text-muted-foreground mb-6">Weekly</h2>
 
-      {/* Grocery Items */}
-      <div className="space-y-4 mb-20">
-        {items.map((item) => (
-          <div key={item.id} className="flex items-center space-x-3">
-            <input
-              type="radio"
-              checked={item.purchased}
-              onChange={() => togglePurchased(item.id)}
-              className="w-4 h-4"
-            />
-            <span className={item.purchased ? "line-through text-muted-foreground" : ""}>
-              {item.name}
-            </span>
-          </div>
-        ))}
+      <Card className="mb-6">
+        <CardHeader>
+          <CardTitle className="text-lg">Items</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-3">
+          {items.length === 0 && (
+            <p className="text-sm text-muted-foreground">No items yet. Add one below.</p>
+          )}
+          {items.map((item) => (
+            <div key={item.id} className="flex items-center space-x-3 group">
+              <input
+                type="radio"
+                checked={item.purchased}
+                onChange={() => toggle(item.id)}
+                className="w-4 h-4"
+              />
+              <span className={`flex-1 ${item.purchased ? "line-through text-muted-foreground" : ""}`}>
+                {item.name}
+              </span>
+              <Button
+                size="sm"
+                variant="ghost"
+                onClick={() => remove(item.id)}
+                className="opacity-0 group-hover:opacity-100 text-destructive"
+              >
+                <Trash2 className="h-4 w-4" />
+              </Button>
+            </div>
+          ))}
+        </CardContent>
+      </Card>
+
+      <Card className="mb-6">
+        <CardHeader>
+          <CardTitle className="text-lg">Recipes</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-3">
+          {recipes.length === 0 && (
+            <p className="text-sm text-muted-foreground">No recipes yet.</p>
+          )}
+          {recipes.map((recipe) => (
+            <div key={recipe.id} className="flex items-center space-x-3">
+              <input type="radio" className="w-4 h-4" />
+              <span>{recipe.title}</span>
+            </div>
+          ))}
+        </CardContent>
+      </Card>
+
+      <div className="mb-6">
+        <h2 className="text-lg font-semibold mb-4">Recipe Suggestions</h2>
+        <div className="flex space-x-4 overflow-x-auto pb-4">
+          {recipeSuggestions.map((recipe) => (
+            <div key={recipe.id} className="flex-shrink-0 w-24">
+              <div className="w-20 h-20 bg-muted rounded-lg mb-2 overflow-hidden">
+                <img src={recipe.image} alt={recipe.name} className="w-full h-full object-cover" />
+              </div>
+              <p className="text-xs text-center text-muted-foreground">{recipe.name}</p>
+            </div>
+          ))}
+        </div>
       </div>
 
-      {/* Add Ingredient Button */}
-      <div className="fixed bottom-20 left-4 right-4">
-        <Button 
-          onClick={addItem} 
-          className="w-full h-12 text-lg"
-          size="lg"
-        >
+      <div className="fixed bottom-20 left-4 right-4 max-w-2xl mx-auto">
+        <Button onClick={() => setOpen(true)} className="w-full h-12 text-lg" size="lg">
           Add Ingredient
         </Button>
       </div>
 
-      {items.length === 0 && (
-        <div className="text-center py-12">
-          <ShoppingCart className="h-16 w-16 mx-auto text-muted-foreground mb-4" />
-          <p className="text-muted-foreground mb-4">Your grocery list is empty</p>
-          <p className="text-sm text-muted-foreground mb-6">
-            Add items manually or select recipes to automatically populate your list
-          </p>
-        </div>
-      )}
+      <Dialog open={open} onOpenChange={setOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Add Ingredient</DialogTitle>
+          </DialogHeader>
+          <Input
+            placeholder="e.g., Tomatoes"
+            value={newName}
+            onChange={(e) => setNewName(e.target.value)}
+            onKeyDown={(e) => e.key === "Enter" && handleAdd()}
+            autoFocus
+          />
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setOpen(false)}>Cancel</Button>
+            <Button onClick={handleAdd}>Add</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
