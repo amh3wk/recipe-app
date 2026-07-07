@@ -1,96 +1,165 @@
 import { useState } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Calendar, ChefHat } from "lucide-react";
+import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Plus, X } from "lucide-react";
+import { useRecipes, useGroceries } from "@/lib/store";
+import { useToast } from "@/hooks/use-toast";
 
-// Mock data
-const groceryItems = [
-  { id: 1, name: "Milk", purchased: false },
-  { id: 2, name: "Eggs", purchased: false },
-  { id: 3, name: "Bread", purchased: false },
-];
+const DAYS = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
+const MEALS = ["Breakfast", "Lunch", "Dinner"] as const;
+type Meal = (typeof MEALS)[number];
+type Plan = Record<string, Partial<Record<Meal, number>>>;
 
-const selectedRecipes = [
-  { id: 1, name: "Spaghetti Carbonara" },
-  { id: 2, name: "Chicken Salad" },
-];
+const STORAGE_KEY = "weekly-plan";
 
-const recipeSuggestions = [
-  { id: 1, name: "Pasta Primavera", image: "https://images.unsplash.com/photo-1563379091339-03246963d96c?w=100&h=100&fit=crop" },
-  { id: 2, name: "Caesar Salad", image: "https://images.unsplash.com/photo-1546793665-c74683f339c1?w=100&h=100&fit=crop" },
-  { id: 3, name: "Grilled Fish", image: "https://images.unsplash.com/photo-1559847844-d826dec4ca58?w=100&h=100&fit=crop" },
-];
+const loadPlan = (): Plan => {
+  try {
+    return JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}");
+  } catch {
+    return {};
+  }
+};
 
-const Plan = () => {
-  const [groceries, setGroceries] = useState(groceryItems);
+const PlanPage = () => {
+  const { recipes } = useRecipes();
+  const { addItem } = useGroceries();
+  const { toast } = useToast();
+  const [plan, setPlan] = useState<Plan>(loadPlan);
+  const [editing, setEditing] = useState<{ day: string; meal: Meal } | null>(null);
+  const [selectedRecipeId, setSelectedRecipeId] = useState<string>("");
 
-  const togglePurchased = (id: number) => {
-    setGroceries(groceries.map(item => 
-      item.id === id ? { ...item, purchased: !item.purchased } : item
-    ));
+  const savePlan = (next: Plan) => {
+    setPlan(next);
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
   };
 
+  const assign = () => {
+    if (!editing || !selectedRecipeId) return;
+    const recipeId = Number(selectedRecipeId);
+    const next = {
+      ...plan,
+      [editing.day]: { ...plan[editing.day], [editing.meal]: recipeId },
+    };
+    savePlan(next);
+
+    const recipe = recipes.find((r) => r.id === recipeId);
+    if (recipe) {
+      recipe.ingredients.forEach((ing) => addItem(ing, recipe.title));
+      toast({ title: "Meal planned", description: `${recipe.title} added to ${editing.day} ${editing.meal}.` });
+    }
+    setEditing(null);
+    setSelectedRecipeId("");
+  };
+
+  const clearMeal = (day: string, meal: Meal) => {
+    const dayPlan = { ...plan[day] };
+    delete dayPlan[meal];
+    savePlan({ ...plan, [day]: dayPlan });
+  };
+
+  const recipeName = (id?: number) => recipes.find((r) => r.id === id)?.title;
+
   return (
-    <div className="container mx-auto px-4 py-6 pb-20">
-      <h1 className="text-2xl font-bold mb-6">Plan</h1>
+    <div className="container mx-auto px-4 py-6 pb-24 max-w-3xl">
+      <h1 className="text-2xl font-bold mb-2">Plan</h1>
+      <h2 className="text-lg font-medium text-muted-foreground mb-6">Weekly Schedule</h2>
 
-      {/* Grocery List Section */}
-      <Card className="mb-6">
-        <CardHeader>
-          <CardTitle className="text-lg">Grocery List</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-3">
-          {groceries.map((item) => (
-            <div key={item.id} className="flex items-center space-x-3">
-              <input
-                type="radio"
-                checked={item.purchased}
-                onChange={() => togglePurchased(item.id)}
-                className="w-4 h-4"
-              />
-              <span className={item.purchased ? "line-through text-muted-foreground" : ""}>
-                {item.name}
-              </span>
+      <div className="space-y-3">
+        {DAYS.map((day) => (
+          <Card key={day} className="p-4">
+            <h3 className="font-semibold mb-3">{day}</h3>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+              {MEALS.map((meal) => {
+                const id = plan[day]?.[meal];
+                const name = recipeName(id);
+                return (
+                  <div
+                    key={meal}
+                    className="border border-border rounded-md p-3 min-h-[70px] flex flex-col"
+                  >
+                    <span className="text-xs uppercase text-muted-foreground mb-1">{meal}</span>
+                    {name ? (
+                      <div className="flex items-start justify-between gap-2 flex-1">
+                        <span className="text-sm font-medium">{name}</span>
+                        <button
+                          onClick={() => clearMeal(day, meal)}
+                          className="text-muted-foreground hover:text-destructive"
+                        >
+                          <X className="h-4 w-4" />
+                        </button>
+                      </div>
+                    ) : (
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="mt-auto justify-start text-muted-foreground h-auto py-1 px-1"
+                        onClick={() => {
+                          setEditing({ day, meal });
+                          setSelectedRecipeId("");
+                        }}
+                      >
+                        <Plus className="h-4 w-4 mr-1" /> Add recipe
+                      </Button>
+                    )}
+                  </div>
+                );
+              })}
             </div>
-          ))}
-        </CardContent>
-      </Card>
-
-      {/* Selected Recipes Section */}
-      <Card className="mb-6">
-        <CardHeader>
-          <CardTitle className="text-lg">Recipes</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-3">
-          {selectedRecipes.map((recipe) => (
-            <div key={recipe.id} className="flex items-center space-x-3">
-              <input type="radio" className="w-4 h-4" />
-              <span>{recipe.name}</span>
-            </div>
-          ))}
-        </CardContent>
-      </Card>
-
-      {/* Recipe Suggestions */}
-      <div className="mb-6">
-        <h2 className="text-lg font-semibold mb-4">Recipe Suggestions</h2>
-        <div className="flex space-x-4 overflow-x-auto pb-4">
-          {recipeSuggestions.map((recipe) => (
-            <div key={recipe.id} className="flex-shrink-0 w-24">
-              <div className="w-20 h-20 bg-muted rounded-lg mb-2 overflow-hidden">
-                <img
-                  src={recipe.image}
-                  alt={recipe.name}
-                  className="w-full h-full object-cover"
-                />
-              </div>
-              <p className="text-xs text-center text-muted-foreground">{recipe.name}</p>
-            </div>
-          ))}
-        </div>
+          </Card>
+        ))}
       </div>
+
+      <Dialog open={!!editing} onOpenChange={(o) => !o && setEditing(null)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>
+              {editing ? `${editing.day} · ${editing.meal}` : ""}
+            </DialogTitle>
+          </DialogHeader>
+          {recipes.length === 0 ? (
+            <p className="text-sm text-muted-foreground">
+              No recipes yet. Add some from the Recipes tab first.
+            </p>
+          ) : (
+            <Select value={selectedRecipeId} onValueChange={setSelectedRecipeId}>
+              <SelectTrigger>
+                <SelectValue placeholder="Choose a recipe" />
+              </SelectTrigger>
+              <SelectContent>
+                {recipes.map((r) => (
+                  <SelectItem key={r.id} value={String(r.id)}>
+                    {r.title}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          )}
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setEditing(null)}>
+              Cancel
+            </Button>
+            <Button onClick={assign} disabled={!selectedRecipeId}>
+              Add to plan
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
 
-export default Plan;
+export default PlanPage;
