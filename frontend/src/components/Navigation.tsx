@@ -1,6 +1,6 @@
 import { Link, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { ShoppingCart, BookOpen, Calendar } from "lucide-react";
+import { ShoppingCart, BookOpen } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const Navigation = () => {
@@ -9,7 +9,6 @@ const Navigation = () => {
   const navItems = [
     { path: "/grocery-list", icon: ShoppingCart, label: "Grocery List" },
     { path: "/recipes", icon: BookOpen, label: "Recipes" },
-    { path: "/plan", icon: Calendar, label: "Plan" },
   ];
 
   return (
