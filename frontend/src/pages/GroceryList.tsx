@@ -153,6 +153,46 @@ const GroceryList = () => {
         </DialogContent>
       </Dialog>
 
+      <Dialog open={recipeOpen} onOpenChange={setRecipeOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Add Recipe</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-3">
+            <div>
+              <Label htmlFor="gl-r-title">Title</Label>
+              <Input id="gl-r-title" value={rTitle} onChange={(e) => setRTitle(e.target.value)} placeholder="e.g., Tomato Soup" autoFocus />
+            </div>
+            <div>
+              <Label htmlFor="gl-r-desc">Description</Label>
+              <Input id="gl-r-desc" value={rDescription} onChange={(e) => setRDescription(e.target.value)} placeholder="Short description" />
+            </div>
+            <div>
+              <Label htmlFor="gl-r-category">Category</Label>
+              <Select value={rCategory} onValueChange={setRCategory}>
+                <SelectTrigger id="gl-r-category">
+                  <SelectValue placeholder="Select a category" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="breakfast">Breakfast</SelectItem>
+                  <SelectItem value="lunch">Lunch</SelectItem>
+                  <SelectItem value="dinner">Dinner</SelectItem>
+                  <SelectItem value="snack">Snack</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <Label htmlFor="gl-r-ing">Ingredients (comma separated)</Label>
+              <Textarea id="gl-r-ing" value={rIngredients} onChange={(e) => setRIngredients(e.target.value)} placeholder="tomatoes, onion, garlic" rows={3} />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setRecipeOpen(false)}>Cancel</Button>
+            <Button onClick={handleAddRecipe}>Save</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
     </div>
   );
 };
