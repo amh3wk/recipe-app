@@ -25,6 +25,7 @@ const GroceryList = () => {
   const [rTitle, setRTitle] = useState("");
   const [rDescription, setRDescription] = useState("");
   const [rIngredients, setRIngredients] = useState("");
+  const [rCategory, setRCategory] = useState("");
   const { toast } = useToast();
 
   const handleAdd = () => {
