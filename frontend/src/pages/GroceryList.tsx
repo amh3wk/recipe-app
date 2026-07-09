@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Trash2, Plus } from "lucide-react";
@@ -25,6 +25,7 @@ const GroceryList = () => {
   const [rTitle, setRTitle] = useState("");
   const [rDescription, setRDescription] = useState("");
   const [rIngredients, setRIngredients] = useState("");
+  const [rCategory, setRCategory] = useState("");
   const { toast } = useToast();
 
   const handleAdd = () => {
@@ -46,11 +47,13 @@ const GroceryList = () => {
       description: rDescription.trim(),
       ingredients,
       image: "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=300&h=200&fit=crop",
+      category: rCategory || undefined,
     });
     toast({ title: "Recipe added", description: `${rTitle} saved to your recipes.` });
     setRTitle("");
     setRDescription("");
     setRIngredients("");
+    setRCategory("");
     setRecipeOpen(false);
   };
 
@@ -94,34 +97,9 @@ const GroceryList = () => {
       <Card className="mb-6">
         <CardHeader className="flex flex-row items-center justify-between space-y-0">
           <CardTitle className="text-lg">Recipes</CardTitle>
-          <DropdownMenu open={recipeOpen} onOpenChange={setRecipeOpen}>
-            <DropdownMenuTrigger asChild>
-              <Button size="sm" variant="outline">
-                <Plus className="h-4 w-4 mr-1" /> Add Recipe
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent className="w-72 p-4" align="end">
-              <h3 className="text-sm font-semibold mb-3">Add Recipe</h3>
-              <div className="space-y-3">
-                <div>
-                  <Label htmlFor="gl-r-title">Title</Label>
-                  <Input id="gl-r-title" value={rTitle} onChange={(e) => setRTitle(e.target.value)} placeholder="e.g., Tomato Soup" autoFocus />
-                </div>
-                <div>
-                  <Label htmlFor="gl-r-desc">Description</Label>
-                  <Input id="gl-r-desc" value={rDescription} onChange={(e) => setRDescription(e.target.value)} placeholder="Short description" />
-                </div>
-                <div>
-                  <Label htmlFor="gl-r-ing">Ingredients (comma separated)</Label>
-                  <Textarea id="gl-r-ing" value={rIngredients} onChange={(e) => setRIngredients(e.target.value)} placeholder="tomatoes, onion, garlic" rows={3} />
-                </div>
-              </div>
-              <div className="flex justify-end space-x-2 mt-4">
-                <Button variant="outline" size="sm" onClick={() => setRecipeOpen(false)}>Cancel</Button>
-                <Button size="sm" onClick={handleAddRecipe}>Save</Button>
-              </div>
-            </DropdownMenuContent>
-          </DropdownMenu>
+          <Button size="sm" variant="outline" onClick={() => setRecipeOpen(true)}>
+            <Plus className="h-4 w-4 mr-1" /> Add Recipe
+          </Button>
         </CardHeader>
         <CardContent className="space-y-3">
           {recipes.length === 0 && (
@@ -171,6 +149,46 @@ const GroceryList = () => {
           <DialogFooter>
             <Button variant="outline" onClick={() => setOpen(false)}>Cancel</Button>
             <Button onClick={handleAdd}>Add</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={recipeOpen} onOpenChange={setRecipeOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Add Recipe</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-3">
+            <div>
+              <Label htmlFor="gl-r-title">Title</Label>
+              <Input id="gl-r-title" value={rTitle} onChange={(e) => setRTitle(e.target.value)} placeholder="e.g., Tomato Soup" autoFocus />
+            </div>
+            <div>
+              <Label htmlFor="gl-r-desc">Description</Label>
+              <Input id="gl-r-desc" value={rDescription} onChange={(e) => setRDescription(e.target.value)} placeholder="Short description" />
+            </div>
+            <div>
+              <Label htmlFor="gl-r-category">Category</Label>
+              <Select value={rCategory} onValueChange={setRCategory}>
+                <SelectTrigger id="gl-r-category">
+                  <SelectValue placeholder="Select a category" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="breakfast">Breakfast</SelectItem>
+                  <SelectItem value="lunch">Lunch</SelectItem>
+                  <SelectItem value="dinner">Dinner</SelectItem>
+                  <SelectItem value="snack">Snack</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <Label htmlFor="gl-r-ing">Ingredients (comma separated)</Label>
+              <Textarea id="gl-r-ing" value={rIngredients} onChange={(e) => setRIngredients(e.target.value)} placeholder="tomatoes, onion, garlic" rows={3} />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setRecipeOpen(false)}>Cancel</Button>
+            <Button onClick={handleAddRecipe}>Save</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

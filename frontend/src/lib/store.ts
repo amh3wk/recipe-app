@@ -13,6 +13,7 @@ export interface Recipe {
   description?: string;
   ingredients: string[];
   image?: string;
+  category?: string;
 }
 
 const DEFAULT_GROCERIES: GroceryItem[] = [
