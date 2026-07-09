@@ -21,6 +21,7 @@ const GroceryList = () => {
   const { recipes, addRecipe } = useRecipes();
   const [open, setOpen] = useState(false);
   const [newName, setNewName] = useState("");
+  const [recipeOpen, setRecipeOpen] = useState(false);
   const [rTitle, setRTitle] = useState("");
   const [rDescription, setRDescription] = useState("");
   const [rIngredients, setRIngredients] = useState("");
