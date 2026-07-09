@@ -47,11 +47,13 @@ const GroceryList = () => {
       description: rDescription.trim(),
       ingredients,
       image: "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=300&h=200&fit=crop",
+      category: rCategory || undefined,
     });
     toast({ title: "Recipe added", description: `${rTitle} saved to your recipes.` });
     setRTitle("");
     setRDescription("");
     setRIngredients("");
+    setRCategory("");
     setRecipeOpen(false);
   };
 
