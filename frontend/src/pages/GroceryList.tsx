@@ -3,7 +3,9 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
-import { Trash2 } from "lucide-react";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Trash2, Plus } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useGroceries, useRecipes } from "@/lib/store";
 
@@ -15,9 +17,13 @@ const recipeSuggestions = [
 
 const GroceryList = () => {
   const { items, addItem, toggle, remove } = useGroceries();
-  const { recipes } = useRecipes();
+  const { recipes, addRecipe } = useRecipes();
   const [open, setOpen] = useState(false);
   const [newName, setNewName] = useState("");
+  const [recipeOpen, setRecipeOpen] = useState(false);
+  const [rTitle, setRTitle] = useState("");
+  const [rDescription, setRDescription] = useState("");
+  const [rIngredients, setRIngredients] = useState("");
   const { toast } = useToast();
 
   const handleAdd = () => {
@@ -26,6 +32,25 @@ const GroceryList = () => {
     toast({ title: "Item added", description: `${newName} added to your list.` });
     setNewName("");
     setOpen(false);
+  };
+
+  const handleAddRecipe = () => {
+    if (!rTitle.trim()) {
+      toast({ title: "Title required", variant: "destructive" });
+      return;
+    }
+    const ingredients = rIngredients.split(",").map((s) => s.trim()).filter(Boolean);
+    addRecipe({
+      title: rTitle.trim(),
+      description: rDescription.trim(),
+      ingredients,
+      image: "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=300&h=200&fit=crop",
+    });
+    toast({ title: "Recipe added", description: `${rTitle} saved to your recipes.` });
+    setRTitle("");
+    setRDescription("");
+    setRIngredients("");
+    setRecipeOpen(false);
   };
 
   return (
@@ -66,8 +91,11 @@ const GroceryList = () => {
       </Card>
 
       <Card className="mb-6">
-        <CardHeader>
+        <CardHeader className="flex flex-row items-center justify-between space-y-0">
           <CardTitle className="text-lg">Recipes</CardTitle>
+          <Button size="sm" variant="outline" onClick={() => setRecipeOpen(true)}>
+            <Plus className="h-4 w-4 mr-1" /> Add Recipe
+          </Button>
         </CardHeader>
         <CardContent className="space-y-3">
           {recipes.length === 0 && (
@@ -117,6 +145,32 @@ const GroceryList = () => {
           <DialogFooter>
             <Button variant="outline" onClick={() => setOpen(false)}>Cancel</Button>
             <Button onClick={handleAdd}>Add</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={recipeOpen} onOpenChange={setRecipeOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Add Recipe</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-3">
+            <div>
+              <Label htmlFor="gl-r-title">Title</Label>
+              <Input id="gl-r-title" value={rTitle} onChange={(e) => setRTitle(e.target.value)} placeholder="e.g., Tomato Soup" autoFocus />
+            </div>
+            <div>
+              <Label htmlFor="gl-r-desc">Description</Label>
+              <Input id="gl-r-desc" value={rDescription} onChange={(e) => setRDescription(e.target.value)} placeholder="Short description" />
+            </div>
+            <div>
+              <Label htmlFor="gl-r-ing">Ingredients (comma separated)</Label>
+              <Textarea id="gl-r-ing" value={rIngredients} onChange={(e) => setRIngredients(e.target.value)} placeholder="tomatoes, onion, garlic" rows={3} />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setRecipeOpen(false)}>Cancel</Button>
+            <Button onClick={handleAddRecipe}>Save</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
