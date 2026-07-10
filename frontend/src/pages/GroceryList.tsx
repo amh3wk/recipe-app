@@ -62,7 +62,7 @@ const GroceryList = () => {
       <h1 className="text-2xl font-bold mb-2">Grocery List</h1>
       <h2 className="text-lg font-medium text-muted-foreground mb-6">Weekly</h2>
 
-      <Card className="mb-6">
+      <Card className="mb-6 liquid-glass">
         <CardHeader>
           <CardTitle className="text-lg">Items</CardTitle>
         </CardHeader>
@@ -94,7 +94,7 @@ const GroceryList = () => {
         </CardContent>
       </Card>
 
-      <Card className="mb-6">
+      <Card className="mb-6 liquid-glass">
         <CardHeader className="flex flex-row items-center justify-between space-y-0">
           <CardTitle className="text-lg">Recipes</CardTitle>
           <Button size="sm" variant="outline" onClick={() => setRecipeOpen(true)}>
