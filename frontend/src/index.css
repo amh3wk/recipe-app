@@ -112,7 +112,34 @@ All colors MUST be HSL.
     @apply border-border;
   }
 
+  html,
   body {
-    @apply bg-background text-foreground;
+    min-height: 100%;
+    margin: 0;
+  }
+
+  body {
+    @apply text-foreground;
+    background: var(--gradient-hero) center / cover no-repeat fixed;
+  }
+}
+
+@layer components {
+  .liquid-glass {
+    background-color: hsl(var(--card) / 0.45) !important;
+    backdrop-filter: blur(24px) saturate(180%);
+    -webkit-backdrop-filter: blur(24px) saturate(180%);
+    border: 1px solid hsl(var(--border) / 0.35) !important;
+    box-shadow:
+      0 8px 32px -8px hsl(var(--foreground) / 0.08),
+      inset 0 1px 0 0 hsl(var(--background) / 0.7);
+  }
+
+  .dark .liquid-glass {
+    background-color: hsl(var(--card) / 0.3) !important;
+    border-color: hsl(var(--border) / 0.3) !important;
+    box-shadow:
+      0 8px 32px -8px hsl(0 0% 0% / 0.25),
+      inset 0 1px 0 0 hsl(var(--foreground) / 0.08);
   }
 }
