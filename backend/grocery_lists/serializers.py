@@ -8,6 +8,10 @@ class GroceryListSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 class GroceryListItemSerializer(serializers.ModelSerializer):
+    ingredient_name = serializers.CharField(
+        source="ingredient.name",
+        read_only=True,
+    )
     class Meta:
         model = GroceryListItem
         fields = "__all__"

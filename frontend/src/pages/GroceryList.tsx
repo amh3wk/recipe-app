@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -9,16 +9,30 @@ import { Textarea } from "@/components/ui/textarea";
 import { Trash2, Plus } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useGroceries, useRecipes } from "@/lib/store";
+import { getRecipes } from "@/api/recipes";
+import { getGroceryLists } from "@/api/groceryLists";
 
 const recipeSuggestions = [
   { id: 1, name: "Pasta Primavera", image: "https://images.unsplash.com/photo-1563379091339-03246963d96c?w=100&h=100&fit=crop" },
   { id: 2, name: "Caesar Salad", image: "https://images.unsplash.com/photo-1546793665-c74683f339c1?w=100&h=100&fit=crop" },
   { id: 3, name: "Grilled Fish", image: "https://images.unsplash.com/photo-1559847844-d826dec4ca58?w=100&h=100&fit=crop" },
 ];
+type ApiRecipe = {
+  id: number;
+  name: string;
+};
+type ApiGroceryListItems = {
+  id: number;
+  ingredient: number;
+  ingredient_name: string;
+  checked: boolean;
+};
 
 const GroceryList = () => {
   const { items, addItem, toggle, remove } = useGroceries();
   const { recipes, addRecipe } = useRecipes();
+  const [apiRecipes, setApiRecipes] = useState<ApiRecipe[]>([]);
+  const [apiGroceryListItems, setApiGroceryListItems] = useState<ApiGroceryListItems[]>([]);
   const [open, setOpen] = useState(false);
   const [newName, setNewName] = useState("");
   const [recipeOpen, setRecipeOpen] = useState(false);
@@ -28,6 +42,29 @@ const GroceryList = () => {
   const [rCategory, setRCategory] = useState("");
   const { toast } = useToast();
 
+  useEffect(() => {
+    async function fetchGroceryLists() {
+      try {
+        const data = await getGroceryLists();
+        console.log("grocery items from API:", data);
+        setApiGroceryListItems(data);
+      } catch (error) {
+        console.error("Failed to fetch grocery items:", error);
+      }
+    }
+
+    async function loadRecipes() {
+      try {
+        const data = await getRecipes();
+        console.log("recipes from API:", data);
+        setApiRecipes(data);
+      } catch (error) {
+        console.error("Failed to fetch recipes:", error);
+      }
+    }
+    fetchGroceryLists();
+    loadRecipes();
+  }, []);
   const handleAdd = () => {
     if (!newName.trim()) return;
     addItem(newName);
@@ -70,16 +107,16 @@ const GroceryList = () => {
           {items.length === 0 && (
             <p className="text-sm text-muted-foreground">No items yet. Add one below.</p>
           )}
-          {items.map((item) => (
+          {apiGroceryListItems.map((item) => (
             <div key={item.id} className="flex items-center space-x-3 group">
               <input
-                type="radio"
-                checked={item.purchased}
+                type="checkbox"
+                checked={item.checked}
                 onChange={() => toggle(item.id)}
                 className="w-4 h-4"
               />
-              <span className={`flex-1 ${item.purchased ? "line-through text-muted-foreground" : ""}`}>
-                {item.name}
+              <span className={`flex-1 ${item.checked ? "line-through text-muted-foreground" : ""}`}>
+                {item.ingredient_name}
               </span>
               <Button
                 size="sm"
@@ -168,16 +205,17 @@ const GroceryList = () => {
               <Input id="gl-r-desc" value={rDescription} onChange={(e) => setRDescription(e.target.value)} placeholder="Short description" />
             </div>
             <div>
-              <Label htmlFor="gl-r-category">Category</Label>
+              <Label htmlFor="gl-r-category">Recipes</Label>
               <Select value={rCategory} onValueChange={setRCategory}>
                 <SelectTrigger id="gl-r-category">
                   <SelectValue placeholder="Select a category" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="breakfast">Breakfast</SelectItem>
-                  <SelectItem value="lunch">Lunch</SelectItem>
-                  <SelectItem value="dinner">Dinner</SelectItem>
-                  <SelectItem value="snack">Snack</SelectItem>
+                  {apiRecipes.map((recipe) => (
+                    <SelectItem key={recipe.id} value={recipe.id.toString()}>
+                      {recipe.name}
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
             </div>
