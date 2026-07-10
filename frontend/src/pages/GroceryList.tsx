@@ -58,9 +58,13 @@ const GroceryList = () => {
   };
 
   return (
-    <div className="container mx-auto px-4 py-6 pb-32 max-w-2xl">
-      <h1 className="text-2xl font-bold mb-2">Grocery List</h1>
-      <h2 className="text-lg font-medium text-muted-foreground mb-6">Weekly</h2>
+    <div className="container mx-auto px-4 py-6 pb-32 max-w-2xl relative overflow-hidden">
+      <div className="absolute -top-10 -right-20 w-72 h-72 rounded-full bg-secondary/20 blur-3xl pointer-events-none" />
+      <div className="absolute top-40 -left-20 w-80 h-80 rounded-full bg-primary/10 blur-3xl pointer-events-none" />
+      <div className="absolute bottom-40 right-0 w-64 h-64 rounded-full bg-accent/30 blur-3xl pointer-events-none" />
+
+      <h1 className="text-2xl font-bold mb-2 relative z-10">Grocery List</h1>
+      <h2 className="text-lg font-medium text-muted-foreground mb-6 relative z-10">Weekly</h2>
 
       <Card className="mb-6 liquid-glass">
         <CardHeader>
