@@ -33,8 +33,6 @@ const GroceryList = () => {
   const { recipes, addRecipe } = useRecipes();
   const [apiRecipes, setApiRecipes] = useState<ApiRecipe[]>([]);
   const [apiGroceryListItems, setApiGroceryListItems] = useState<ApiGroceryListItems[]>([]);
-  const [open, setOpen] = useState(false);
-  const [newName, setNewName] = useState("");
   const [recipeOpen, setRecipeOpen] = useState(false);
   const [rTitle, setRTitle] = useState("");
   const [rDescription, setRDescription] = useState("");
