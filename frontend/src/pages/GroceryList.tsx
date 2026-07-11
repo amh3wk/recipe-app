@@ -95,7 +95,7 @@ const GroceryList = () => {
   };
 
   return (
-    <div className="container mx-auto px-4 py-6 pb-32 max-w-2xl relative overflow-hidden">
+    <div className="container mx-auto px-4 py-6 pb-20 max-w-2xl relative overflow-hidden">
       <div className="absolute -top-10 -right-20 w-72 h-72 rounded-full bg-secondary/20 blur-3xl pointer-events-none" />
       <div className="absolute top-40 -left-20 w-80 h-80 rounded-full bg-primary/10 blur-3xl pointer-events-none" />
       <div className="absolute bottom-40 right-0 w-64 h-64 rounded-full bg-accent/30 blur-3xl pointer-events-none" />
@@ -109,7 +109,7 @@ const GroceryList = () => {
         </CardHeader>
         <CardContent className="space-y-3">
           {items.length === 0 && (
-            <p className="text-sm text-muted-foreground">No items yet. Add one below.</p>
+            <p className="text-sm text-muted-foreground">No items yet. Tap + to add one.</p>
           )}
           {apiGroceryListItems.map((item) => (
             <div key={item.id} className="flex items-center space-x-3 group">
@@ -132,6 +132,15 @@ const GroceryList = () => {
               </Button>
             </div>
           ))}
+          <Button
+            size="icon"
+            variant="outline"
+            onClick={() => setOpen(true)}
+            className="h-8 w-8 rounded-md border-dashed"
+            aria-label="Add ingredient"
+          >
+            <Plus className="h-4 w-4" />
+          </Button>
         </CardContent>
       </Card>
 
@@ -167,12 +176,6 @@ const GroceryList = () => {
             </div>
           ))}
         </div>
-      </div>
-
-      <div className="fixed bottom-20 left-4 right-4 max-w-2xl mx-auto">
-        <Button onClick={() => setOpen(true)} className="w-full h-12 text-lg" size="lg">
-          Add Ingredient
-        </Button>
       </div>
 
       <Dialog open={open} onOpenChange={setOpen}>
