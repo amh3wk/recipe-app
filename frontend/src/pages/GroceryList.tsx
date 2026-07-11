@@ -63,12 +63,16 @@ const GroceryList = () => {
     fetchGroceryLists();
     loadRecipes();
   }, []);
-  const handleAdd = () => {
-    if (!newName.trim()) return;
-    addItem(newName);
-    toast({ title: "Item added", description: `${newName} added to your list.` });
-    setNewName("");
-    setOpen(false);
+  const handleQuickAdd = () => {
+    let base = "New item";
+    let name = base;
+    let count = 1;
+    while (items.some((i) => i.name.toLowerCase() === name.toLowerCase())) {
+      count += 1;
+      name = `${base} ${count}`;
+    }
+    addItem(name);
+    toast({ title: "Item added", description: `${name} added to your list.` });
   };
 
   const handleAddRecipe = () => {
