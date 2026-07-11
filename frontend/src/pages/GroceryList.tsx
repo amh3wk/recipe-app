@@ -109,7 +109,7 @@ const GroceryList = () => {
         </CardHeader>
         <CardContent className="space-y-3">
           {items.length === 0 && (
-            <p className="text-sm text-muted-foreground">No items yet. Add one below.</p>
+            <p className="text-sm text-muted-foreground">No items yet. Tap + to add one.</p>
           )}
           {apiGroceryListItems.map((item) => (
             <div key={item.id} className="flex items-center space-x-3 group">
@@ -132,6 +132,15 @@ const GroceryList = () => {
               </Button>
             </div>
           ))}
+          <Button
+            size="icon"
+            variant="outline"
+            onClick={() => setOpen(true)}
+            className="h-8 w-8 rounded-md border-dashed"
+            aria-label="Add ingredient"
+          >
+            <Plus className="h-4 w-4" />
+          </Button>
         </CardContent>
       </Card>
 
