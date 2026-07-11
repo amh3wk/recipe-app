@@ -137,7 +137,7 @@ const GroceryList = () => {
           <Button
             size="icon"
             variant="outline"
-            onClick={() => setOpen(true)}
+            onClick={handleQuickAdd}
             className="h-8 w-8 rounded-md border-dashed"
             aria-label="Add ingredient"
           >
