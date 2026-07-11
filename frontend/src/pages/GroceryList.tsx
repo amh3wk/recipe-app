@@ -180,25 +180,6 @@ const GroceryList = () => {
         </div>
       </div>
 
-      <Dialog open={open} onOpenChange={setOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Add Ingredient</DialogTitle>
-          </DialogHeader>
-          <Input
-            placeholder="e.g., Tomatoes"
-            value={newName}
-            onChange={(e) => setNewName(e.target.value)}
-            onKeyDown={(e) => e.key === "Enter" && handleAdd()}
-            autoFocus
-          />
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setOpen(false)}>Cancel</Button>
-            <Button onClick={handleAdd}>Add</Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-
       <Dialog open={recipeOpen} onOpenChange={setRecipeOpen}>
         <DialogContent>
           <DialogHeader>
