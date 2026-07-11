@@ -64,7 +64,7 @@ const GroceryList = () => {
     loadRecipes();
   }, []);
   const handleQuickAdd = () => {
-    let base = "New item";
+    const base = "New item";
     let name = base;
     let count = 1;
     while (items.some((i) => i.name.toLowerCase() === name.toLowerCase())) {
