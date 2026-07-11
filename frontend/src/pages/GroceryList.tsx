@@ -10,7 +10,7 @@ import { Trash2, Plus } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useGroceries, useRecipes } from "@/lib/store";
 import { getRecipes } from "@/api/recipes";
-import { getGroceryLists } from "@/api/groceryLists";
+import { getGroceryLists, toggleGroceryListItem } from "@/api/groceryLists";
 
 const recipeSuggestions = [
   { id: 1, name: "Pasta Primavera", image: "https://images.unsplash.com/photo-1563379091339-03246963d96c?w=100&h=100&fit=crop" },
@@ -29,7 +29,7 @@ type ApiGroceryListItems = {
 };
 
 const GroceryList = () => {
-  const { items, addItem, toggle, remove } = useGroceries();
+  const { items, addItem, remove } = useGroceries();
   const { recipes, addRecipe } = useRecipes();
   const [apiRecipes, setApiRecipes] = useState<ApiRecipe[]>([]);
   const [apiGroceryListItems, setApiGroceryListItems] = useState<ApiGroceryListItems[]>([]);
@@ -65,6 +65,24 @@ const GroceryList = () => {
     fetchGroceryLists();
     loadRecipes();
   }, []);
+
+  const handleToggleGroceryItem = async (itemId: number) => {
+    const item = apiGroceryListItems.find((item) => item.id === itemId);
+    if (!item) return;
+
+    const newCheckedValue = !item.checked;
+    try {
+      const updatedItem = await toggleGroceryListItem(itemId, newCheckedValue);
+      setApiGroceryListItems((prevItems) =>
+        prevItems.map((item) =>
+          item.id === itemId ? updatedItem : item
+        )
+      );
+    } catch (error) {
+      console.error("Failed to toggle grocery item:", error);
+    }
+
+  }
   const handleAdd = () => {
     if (!newName.trim()) return;
     addItem(newName);
@@ -116,7 +134,7 @@ const GroceryList = () => {
               <input
                 type="checkbox"
                 checked={item.checked}
-                onChange={() => toggle(item.id)}
+                onChange={() => handleToggleGroceryItem(item.id)}
                 className="w-4 h-4"
               />
               <span className={`flex-1 ${item.checked ? "line-through text-muted-foreground" : ""}`}>

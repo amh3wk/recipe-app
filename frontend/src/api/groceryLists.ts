@@ -39,3 +39,15 @@ export async function addRecipeToGroceryList(
 
   return response.json();
 }
+
+export async function toggleGroceryListItem(itemId: number, checked: boolean) {
+  const response = await fetch(`${API_BASE_URL}/grocery-list-items/${itemId}/`, {
+    method: "PATCH",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ checked }),
+  });
+
+  return response.json();
+}
