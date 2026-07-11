@@ -33,8 +33,6 @@ const GroceryList = () => {
   const { recipes, addRecipe } = useRecipes();
   const [apiRecipes, setApiRecipes] = useState<ApiRecipe[]>([]);
   const [apiGroceryListItems, setApiGroceryListItems] = useState<ApiGroceryListItems[]>([]);
-  const [open, setOpen] = useState(false);
-  const [newName, setNewName] = useState("");
   const [recipeOpen, setRecipeOpen] = useState(false);
   const [rTitle, setRTitle] = useState("");
   const [rDescription, setRDescription] = useState("");
@@ -65,12 +63,16 @@ const GroceryList = () => {
     fetchGroceryLists();
     loadRecipes();
   }, []);
-  const handleAdd = () => {
-    if (!newName.trim()) return;
-    addItem(newName);
-    toast({ title: "Item added", description: `${newName} added to your list.` });
-    setNewName("");
-    setOpen(false);
+  const handleQuickAdd = () => {
+    const base = "New item";
+    let name = base;
+    let count = 1;
+    while (items.some((i) => i.name.toLowerCase() === name.toLowerCase())) {
+      count += 1;
+      name = `${base} ${count}`;
+    }
+    addItem(name);
+    toast({ title: "Item added", description: `${name} added to your list.` });
   };
 
   const handleAddRecipe = () => {
@@ -135,7 +137,7 @@ const GroceryList = () => {
           <Button
             size="icon"
             variant="outline"
-            onClick={() => setOpen(true)}
+            onClick={handleQuickAdd}
             className="h-8 w-8 rounded-md border-dashed"
             aria-label="Add ingredient"
           >
@@ -177,25 +179,6 @@ const GroceryList = () => {
           ))}
         </div>
       </div>
-
-      <Dialog open={open} onOpenChange={setOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Add Ingredient</DialogTitle>
-          </DialogHeader>
-          <Input
-            placeholder="e.g., Tomatoes"
-            value={newName}
-            onChange={(e) => setNewName(e.target.value)}
-            onKeyDown={(e) => e.key === "Enter" && handleAdd()}
-            autoFocus
-          />
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setOpen(false)}>Cancel</Button>
-            <Button onClick={handleAdd}>Add</Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
 
       <Dialog open={recipeOpen} onOpenChange={setRecipeOpen}>
         <DialogContent>
