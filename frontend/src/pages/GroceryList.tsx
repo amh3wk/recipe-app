@@ -10,7 +10,7 @@ import { Trash2, Plus } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useGroceries, useRecipes } from "@/lib/store";
 import { getRecipes } from "@/api/recipes";
-import { getGroceryLists, toggleGroceryListItem } from "@/api/groceryLists";
+import { getGroceryLists, toggleGroceryListItem, createGroceryListItem } from "@/api/groceryLists";
 
 const recipeSuggestions = [
   { id: 1, name: "Pasta Primavera", image: "https://images.unsplash.com/photo-1563379091339-03246963d96c?w=100&h=100&fit=crop" },
@@ -38,6 +38,8 @@ const GroceryList = () => {
   const [rDescription, setRDescription] = useState("");
   const [rIngredients, setRIngredients] = useState("");
   const [rCategory, setRCategory] = useState("");
+  const [isAddingIngredient, setIsAddingIngredient] = useState(false);
+  const [newIngredientName, setNewIngredientName] = useState("");
   const { toast } = useToast();
 
   useEffect(() => {
@@ -81,14 +83,35 @@ const GroceryList = () => {
     }
 
   }
-  const handleAdd = () => {
-    if (!newName.trim()) return;
-    addItem(newName);
-    toast({ title: "Item added", description: `${newName} added to your list.` });
-    setNewName("");
-    setOpen(false);
-  };
 
+  const handleShowIngredientInput = () => {
+    setIsAddingIngredient(true);
+    setNewIngredientName("");
+  };
+  const handleSaveIngredient = async () => {
+    const ingredientName = newIngredientName.trim();
+
+    if (!ingredientName) {
+      setIsAddingIngredient(false);
+      return;
+    }
+
+    // Call your create-grocery-item API here.
+    console.log("New ingredient:", ingredientName);
+    try {
+      const new_item = await createGroceryListItem({
+        ingredient_name: ingredientName,
+        quantity: 1,
+        unit: "",
+        grocery_list: 1,
+      });
+      setApiGroceryListItems((prevItems) => [...prevItems, new_item]);
+      setNewIngredientName("");
+      setIsAddingIngredient(true);
+    } catch (error) {
+      console.error("Failed to create grocery item:", error);
+    }
+  };
   const handleAddRecipe = () => {
     if (!rTitle.trim()) {
       toast({ title: "Title required", variant: "destructive" });
@@ -124,7 +147,7 @@ const GroceryList = () => {
           <CardTitle className="text-lg">Items</CardTitle>
         </CardHeader>
         <CardContent className="space-y-3">
-          {items.length === 0 && (
+          {apiGroceryListItems.length === 0 && (
             <p className="text-sm text-muted-foreground">No items yet. Tap + to add one.</p>
           )}
           {apiGroceryListItems.map((item) => (
@@ -148,15 +171,55 @@ const GroceryList = () => {
               </Button>
             </div>
           ))}
-          <Button
+
+          {isAddingIngredient && (
+            <div className="flex items-center space-x-3">
+              <input
+                type="checkbox"
+                disabled
+                className="w-4 h-4"
+              />
+
+              <Input
+                value={newIngredientName}
+                onChange={(event) => setNewIngredientName(event.target.value)}
+                onKeyDown={(event) => {
+                  if (event.key === "Enter") {
+                    handleSaveIngredient();
+                  }
+
+                  if (event.key === "Escape") {
+                    setNewIngredientName("");
+                    setIsAddingIngredient(false);
+                  }
+                }}
+                onBlur={handleSaveIngredient}
+                placeholder="Ingredient name"
+                className="h-8 flex-1"
+                autoFocus
+              />
+            </div>
+          )}
+
+          {!isAddingIngredient && (
+            <Button
+              size="icon"
+              variant="outline"
+              className="h-8 w-8 rounded-md border-dashed"
+              aria-label="Add ingredient"
+              onClick={handleShowIngredientInput}
+            >
+              <Plus className="h-4 w-4" />
+            </Button>
+          )}
+          {/* <Button
             size="icon"
             variant="outline"
-            onClick={handleQuickAdd}
             className="h-8 w-8 rounded-md border-dashed"
             aria-label="Add ingredient"
           >
             <Plus className="h-4 w-4" />
-          </Button>
+          </Button> */}
         </CardContent>
       </Card>
 
