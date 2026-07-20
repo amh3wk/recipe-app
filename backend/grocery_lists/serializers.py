@@ -49,6 +49,15 @@ class GroceryListItemSerializer(serializers.ModelSerializer):
         return representation
 
 class GroceryListRecipeSerializer(serializers.ModelSerializer):
+    recipe_name = serializers.CharField(
+        source="recipe.name", 
+        read_only=True
+    )
     class Meta:
         model = GroceryListRecipe
-        fields = "__all__"
+        fields = [
+            "id",
+            "grocery_list",
+            "recipe",
+            "recipe_name",
+        ]

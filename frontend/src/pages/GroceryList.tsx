@@ -10,7 +10,7 @@ import { Trash2, Plus } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useGroceries, useRecipes } from "@/lib/store";
 import { getRecipes } from "@/api/recipes";
-import { getGroceryLists, toggleGroceryListItem, createGroceryListItem } from "@/api/groceryLists";
+import { getGroceryLists, toggleGroceryListItem, createGroceryListItem, getGroceryListRecipes, addRecipeToGroceryList, deleteGroceryListItem, deleteGroceryListRecipe } from "@/api/groceryLists";
 
 const recipeSuggestions = [
   { id: 1, name: "Pasta Primavera", image: "https://images.unsplash.com/photo-1563379091339-03246963d96c?w=100&h=100&fit=crop" },
@@ -26,6 +26,15 @@ type ApiGroceryListItems = {
   ingredient: number;
   ingredient_name: string;
   checked: boolean;
+  quantity: number;
+  unit: string;
+};
+
+type ApiGroceryListRecipes = {
+  id: number;
+  recipe: number;
+  recipe_name: string;
+  grocery_list: number;
 };
 
 const GroceryList = () => {
@@ -37,9 +46,10 @@ const GroceryList = () => {
   const [rTitle, setRTitle] = useState("");
   const [rDescription, setRDescription] = useState("");
   const [rIngredients, setRIngredients] = useState("");
-  const [rCategory, setRCategory] = useState("");
+  const [newRecipe, setNewRecipe] = useState("");
   const [isAddingIngredient, setIsAddingIngredient] = useState(false);
   const [newIngredientName, setNewIngredientName] = useState("");
+  const [apiGroceryListRecipes, setApiGroceryListRecipes] = useState<ApiGroceryListRecipes[]>([]);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -62,8 +72,19 @@ const GroceryList = () => {
         console.error("Failed to fetch recipes:", error);
       }
     }
+
+    async function fetchGroceryListRecipes(groceryListId: number) {
+      try {
+        const data = await getGroceryListRecipes(groceryListId); 
+        console.log("grocery list recipes from API:", data);
+        setApiGroceryListRecipes(data);
+      } catch (error) {
+        console.error("Failed to fetch grocery list recipes:", error);
+      }
+    }
     fetchGroceryLists();
     loadRecipes();
+    fetchGroceryListRecipes(1); 
   }, []);
 
   const handleToggleGroceryItem = async (itemId: number) => {
@@ -112,27 +133,52 @@ const GroceryList = () => {
       console.error("Failed to create grocery item:", error);
     }
   };
-  const handleAddRecipe = () => {
-    if (!rTitle.trim()) {
-      toast({ title: "Title required", variant: "destructive" });
-      return;
+  const handleAddRecipe = async () => {
+    
+    try {
+      const addedRecipe = await addRecipeToGroceryList(
+        1,
+        parseInt(newRecipe),
+      );
+      console.log("addedRecipe:", addedRecipe);
+      setApiGroceryListRecipes((prevRecipes) => [...prevRecipes, addedRecipe]);
+      const updatedGroceryListItems = await getGroceryLists();
+      setApiGroceryListItems(updatedGroceryListItems);
+      toast({ title: "Recipe added", description: `${rTitle} saved to your recipes.` });
+      setNewRecipe("");
+      setRecipeOpen(false);
+    } catch (error) {
+      console.error("Failed to add recipe to grocery list:", error);
     }
-    const ingredients = rIngredients.split(",").map((s) => s.trim()).filter(Boolean);
-    addRecipe({
-      title: rTitle.trim(),
-      description: rDescription.trim(),
-      ingredients,
-      image: "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=300&h=200&fit=crop",
-      category: rCategory || undefined,
-    });
-    toast({ title: "Recipe added", description: `${rTitle} saved to your recipes.` });
-    setRTitle("");
-    setRDescription("");
-    setRIngredients("");
-    setRCategory("");
-    setRecipeOpen(false);
   };
 
+  const handleDeleteItem = async (itemId: number) => {
+    try {
+      await deleteGroceryListItem(itemId);
+      setApiGroceryListItems((currentItems) => currentItems.filter((item) => item.id !== itemId));
+    } catch (error) {
+      console.error("Failed to delete grocery item:", error);
+    }
+  };
+
+  const handleDeleteRecipe = async (recipeId: number) => {
+    try {
+      console.log("Deleting recipe with ID:", recipeId);
+      await deleteGroceryListRecipe(
+        1,
+        recipeId
+      );
+      setApiGroceryListRecipes((currentRecipes) => currentRecipes.filter((recipe) => recipe.id !== recipeId));
+      const updatedGroceryListItems = await getGroceryLists();
+      setApiGroceryListItems(updatedGroceryListItems);
+      const updatedGroceryListRecipes = await getGroceryListRecipes(1);
+      setApiGroceryListRecipes(updatedGroceryListRecipes);
+    } catch (error) {
+      console.error("Failed to delete grocery list recipe:", error);
+    }
+  };
+  // console.log("newRecipe:", newRecipe);
+  // console.log("apiGroceryListRecipes:", apiGroceryListRecipes);
   return (
     <div className="container mx-auto px-4 py-6 pb-20 max-w-2xl relative overflow-hidden">
       <div className="absolute -top-10 -right-20 w-72 h-72 rounded-full bg-secondary/20 blur-3xl pointer-events-none" />
@@ -161,10 +207,11 @@ const GroceryList = () => {
               <span className={`flex-1 ${item.checked ? "line-through text-muted-foreground" : ""}`}>
                 {item.ingredient_name}
               </span>
+              <span className="text-sm text-muted-foreground">{item.quantity} {item.unit}</span>
               <Button
                 size="sm"
                 variant="ghost"
-                onClick={() => remove(item.id)}
+                onClick={() => handleDeleteItem(item.id)}
                 className="opacity-0 group-hover:opacity-100 text-destructive"
               >
                 <Trash2 className="h-4 w-4" />
@@ -212,14 +259,6 @@ const GroceryList = () => {
               <Plus className="h-4 w-4" />
             </Button>
           )}
-          {/* <Button
-            size="icon"
-            variant="outline"
-            className="h-8 w-8 rounded-md border-dashed"
-            aria-label="Add ingredient"
-          >
-            <Plus className="h-4 w-4" />
-          </Button> */}
         </CardContent>
       </Card>
 
@@ -231,13 +270,23 @@ const GroceryList = () => {
           </Button>
         </CardHeader>
         <CardContent className="space-y-3">
-          {recipes.length === 0 && (
+          {apiGroceryListRecipes.length === 0 && (
             <p className="text-sm text-muted-foreground">No recipes yet.</p>
           )}
-          {recipes.map((recipe) => (
-            <div key={recipe.id} className="flex items-center space-x-3">
-              <input type="radio" className="w-4 h-4" />
-              <span>{recipe.title}</span>
+          {apiGroceryListRecipes.map((recipe) => (
+            <div key={recipe.id} className="flex items-center justify-between space-x-3 group">
+              <div className="flex items-center space-x-3">
+                <input type="radio" className="w-4 h-4" />
+                <span>{recipe.recipe_name}</span>
+              </div>
+              <Button
+                size="sm"
+                variant="ghost"
+                onClick={() => handleDeleteRecipe(recipe.recipe)}
+                className="opacity-0 group-hover:opacity-100 text-destructive"
+              >
+                <Trash2 className="h-4 w-4" />
+              </Button>
             </div>
           ))}
         </CardContent>
@@ -264,18 +313,10 @@ const GroceryList = () => {
           </DialogHeader>
           <div className="space-y-3">
             <div>
-              <Label htmlFor="gl-r-title">Title</Label>
-              <Input id="gl-r-title" value={rTitle} onChange={(e) => setRTitle(e.target.value)} placeholder="e.g., Tomato Soup" autoFocus />
-            </div>
-            <div>
-              <Label htmlFor="gl-r-desc">Description</Label>
-              <Input id="gl-r-desc" value={rDescription} onChange={(e) => setRDescription(e.target.value)} placeholder="Short description" />
-            </div>
-            <div>
-              <Label htmlFor="gl-r-category">Recipes</Label>
-              <Select value={rCategory} onValueChange={setRCategory}>
-                <SelectTrigger id="gl-r-category">
-                  <SelectValue placeholder="Select a category" />
+              <Label htmlFor="gl-r-recipe">Recipes</Label>
+              <Select value={newRecipe} onValueChange={setNewRecipe}>
+                <SelectTrigger id="gl-r-recipe">
+                  <SelectValue placeholder="Select a recipe" />
                 </SelectTrigger>
                 <SelectContent>
                   {apiRecipes.map((recipe) => (
@@ -285,10 +326,6 @@ const GroceryList = () => {
                   ))}
                 </SelectContent>
               </Select>
-            </div>
-            <div>
-              <Label htmlFor="gl-r-ing">Ingredients (comma separated)</Label>
-              <Textarea id="gl-r-ing" value={rIngredients} onChange={(e) => setRIngredients(e.target.value)} placeholder="tomatoes, onion, garlic" rows={3} />
             </div>
           </div>
           <DialogFooter>

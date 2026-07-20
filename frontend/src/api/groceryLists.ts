@@ -39,6 +39,18 @@ export async function getGroceryLists() {
   return response.json();
 }
 
+export async function getGroceryListRecipes(groceryListId: number) {
+  const response = await fetch(
+    `${API_BASE_URL}/grocery-list-recipes/?grocery_list=${groceryListId}/`,
+    {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    }
+  );
+  return response.json();
+}
 export async function addRecipeToGroceryList(
   groceryListId: number,
   recipeId: number
@@ -55,6 +67,29 @@ export async function addRecipeToGroceryList(
   );
 
   return response.json();
+}
+
+export async function deleteGroceryListRecipe(
+  groceryListId: number,
+  recipeId: number
+) : Promise<void> {
+  const response = await fetch(
+    `${API_BASE_URL}/grocery-lists/${groceryListId}/remove-recipe/`,
+    {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ recipe_id: recipeId }),
+    }
+  );
+
+  if (!response.ok) {
+    const errorBody = await response.text();
+    throw new Error(
+      `Failed to delete grocery-list item: ${response.status} ${errorBody}`
+    );
+  }
 }
 
 export async function toggleGroceryListItem(itemId: number, checked: boolean) {
@@ -91,4 +126,22 @@ export async function createGroceryListItem(
   }
 
   return response.json();
+}
+
+export async function deleteGroceryListItem(
+  itemId: number
+) : Promise<void> {
+  const response = await fetch(
+    `${API_BASE_URL}/grocery-list-items/${itemId}/`, 
+    {
+      method: "DELETE",
+    }
+  );
+
+  if (!response.ok) {
+    const errorBody = await response.text();
+    throw new Error(
+      `Failed to delete grocery-list item: ${response.status} ${errorBody}`
+    );
+  }
 }
