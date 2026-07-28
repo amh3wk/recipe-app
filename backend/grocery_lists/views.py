@@ -1,6 +1,7 @@
 from django.shortcuts import render
 from rest_framework import viewsets, status
 from django.db import transaction
+from django.db.models import F
 from rest_framework.response import Response
 from rest_framework.decorators import action
 from .models import GroceryList, GroceryListItem, GroceryListRecipe
@@ -25,19 +26,38 @@ class GroceryListViewSet(viewsets.ModelViewSet):
         except Recipe.DoesNotExist:
             return Response({"error": "Recipe not found."}, status=status.HTTP_404_NOT_FOUND)
 
-        grocery_list_recipe, created = GroceryListRecipe.objects.get_or_create(
-            grocery_list=grocery_list, 
-            recipe=recipe
-        )
-        serializer = GroceryListRecipeSerializer(grocery_list_recipe)
-        recipe_ingredients = RecipeIngredient.objects.filter(recipe=recipe)
-        for recipe_ingredient in recipe_ingredients:
-            GroceryListItem.objects.get_or_create(
-                grocery_list=grocery_list,
-                ingredient=recipe_ingredient.ingredient,
-                quantity=recipe_ingredient.quantity,
-                unit=recipe_ingredient.unit
+        with transaction.atomic():
+            grocery_list_recipe, recipe_added = GroceryListRecipe.objects.get_or_create(
+                grocery_list=grocery_list, 
+                recipe=recipe
             )
+            serializer = GroceryListRecipeSerializer(grocery_list_recipe)
+            recipe_ingredients = RecipeIngredient.objects.filter(
+                recipe=recipe
+            ).select_related('ingredient')
+
+            if recipe_added:
+                for recipe_ingredient in recipe_ingredients:
+                    grocery_item, item_created = GroceryListItem.objects.get_or_create(
+                        grocery_list=grocery_list,
+                        ingredient=recipe_ingredient.ingredient,
+                        defaults={
+                            "quantity": recipe_ingredient.quantity,
+                            "unit": recipe_ingredient.unit
+                        },
+                    )
+                    
+                    if not item_created:
+                        print(f"item_created: {item_created}")
+                        # if grocery_item.unit != recipe_ingredient.unit:
+                        #     return Response(
+                        #         {"error": f"Unit mismatch for ingredient {grocery_item.ingredient.name}. Existing unit: {grocery_item.unit}, New unit: {recipe_ingredient.unit}."},
+                        #         status=status.HTTP_400_BAD_REQUEST
+                        #     )
+                        print(f"recipe_ingredient: {recipe_ingredient}, grocery_item: {grocery_item.quantity}, grocery_item.unit: {grocery_item.unit}")
+                        GroceryListItem.objects.filter(id=grocery_item.id).update(
+                            quantity=F("quantity") + recipe_ingredient.quantity
+                        )
         return Response(serializer.data, status=status.HTTP_200_OK)
     
     @action(detail=True, methods=["delete"], url_path="remove-recipe")
