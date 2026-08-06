@@ -74,11 +74,11 @@ const PlanPage = () => {
   const recipeName = (id?: number) => recipes.find((r) => r.id === id)?.title;
 
   return (
-    <div className="container mx-auto px-4 py-6 pb-24 max-w-3xl">
+    <div className="mx-auto flex h-dvh w-full flex-col overflow-hidden px-4 max-w-3xl pt-[calc(env(safe-area-inset-top)+1.5rem)]">
       <h1 className="text-2xl font-bold mb-2">Plan</h1>
       <h2 className="text-lg font-medium text-muted-foreground mb-6">Weekly Schedule</h2>
 
-      <div className="space-y-3">
+      <div className="flex-1 overflow-y-auto min-h-0 overflow-y-contain pb-[calc(6rem+env(safe-area-inset-bottom))] [-webkit-overflow-scrolling:touch]">
         {DAYS.map((day) => (
           <Card key={day} className="p-4">
             <h3 className="font-semibold mb-3">{day}</h3>

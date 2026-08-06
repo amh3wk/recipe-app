@@ -180,7 +180,7 @@ const GroceryList = () => {
   // console.log("newRecipe:", newRecipe);
   // console.log("apiGroceryListRecipes:", apiGroceryListRecipes);
   return (
-    <div className="container mx-auto px-4 py-6 pb-20 max-w-2xl relative overflow-hidden">
+    <div className="container mx-auto px-4 max-w-2xl relative min-h-screen pt-[calc(env(safe-area-inset-top)+1.5rem)] pb-[calc(env(safe-area-inset-bottom)+6rem)]">
       <div className="absolute -top-10 -right-20 w-72 h-72 rounded-full bg-secondary/20 blur-3xl pointer-events-none" />
       <div className="absolute top-40 -left-20 w-80 h-80 rounded-full bg-primary/10 blur-3xl pointer-events-none" />
       <div className="absolute bottom-40 right-0 w-64 h-64 rounded-full bg-accent/30 blur-3xl pointer-events-none" />
@@ -297,7 +297,7 @@ const GroceryList = () => {
         <div className="flex space-x-4 overflow-x-auto pb-4">
           {recipeSuggestions.map((recipe) => (
             <div key={recipe.id} className="flex-shrink-0 w-24">
-              <div className="w-20 h-20 bg-muted rounded-lg mb-2 overflow-hidden">
+              <div className="w-20 h-20 bg-muted rounded-lg mb-2">
                 <img src={recipe.image} alt={recipe.name} className="w-full h-full object-cover" />
               </div>
               <p className="text-xs text-center text-muted-foreground">{recipe.name}</p>
