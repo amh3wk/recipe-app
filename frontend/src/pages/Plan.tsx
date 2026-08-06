@@ -15,7 +15,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Plus, X } from "lucide-react";
+import { Plus, X, Sun, Moon, ChevronRight, GripVertical } from "lucide-react";
 import { useRecipes, useGroceries } from "@/lib/store";
 import { useToast } from "@/hooks/use-toast";
 
@@ -25,6 +25,25 @@ type Meal = (typeof MEALS)[number];
 type Plan = Record<string, Partial<Record<Meal, number>>>;
 
 const STORAGE_KEY = "weekly-plan";
+
+// Dates for the current week, starting Monday
+const weekDates = (() => {
+  const now = new Date();
+  const monday = new Date(now);
+  monday.setDate(now.getDate() - ((now.getDay() + 6) % 7));
+  return DAYS.map((_, i) => {
+    const d = new Date(monday);
+    d.setDate(monday.getDate() + i);
+    return d;
+  });
+})();
+const todayIndex = (new Date().getDay() + 6) % 7;
+
+const mealStyles: Record<Meal, { icon: typeof Sun; tint: string; fg: string }> = {
+  Breakfast: { icon: Sun, tint: "bg-secondary/15", fg: "text-secondary" },
+  Lunch: { icon: Sun, tint: "bg-primary/10", fg: "text-primary" },
+  Dinner: { icon: Moon, tint: "bg-accent/40", fg: "text-accent-foreground" },
+};
 
 const loadPlan = (): Plan => {
   try {
@@ -79,54 +98,76 @@ const PlanPage = () => {
       <h2 className="text-sm font-medium text-muted-foreground mb-3">Weekly Schedule</h2>
 
       <div className="flex-1 min-h-0 overflow-y-auto pb-[calc(5rem+env(safe-area-inset-bottom))] [-webkit-overflow-scrolling:touch]">
-        <div className="flex flex-col gap-2">
-          {DAYS.map((day) => (
-            <Card key={day} className="p-2">
-              <h3 className="text-sm font-semibold leading-none mb-1.5">{day}</h3>
-              <div className="grid grid-cols-3 gap-1.5">
-                {MEALS.map((meal) => {
-                  const id = plan[day]?.[meal];
-                  const name = recipeName(id);
-                  return (
+        <div className="flex flex-col gap-3">
+          {DAYS.map((day, i) => {
+            const isToday = i === todayIndex;
+            return (
+              <Card
+                key={day}
+                className={`flex overflow-hidden rounded-2xl border-0 shadow-sm ${
+                  isToday ? "bg-primary/10" : "bg-card"
+                }`}
+              >
+                <div className="flex items-center gap-1 pl-2 pr-3 py-3">
+                  <GripVertical className="h-4 w-4 text-muted-foreground/40" />
+                  <div className="w-12 text-center">
                     <div
-                      key={meal}
-                      className="border border-border rounded-md p-1.5 min-h-[44px] flex flex-col"
+                      className={`text-[11px] font-semibold uppercase tracking-widest ${
+                        isToday ? "text-primary" : "text-muted-foreground"
+                      }`}
                     >
-                      <span className="text-[10px] uppercase tracking-wide text-muted-foreground leading-none mb-1">
-                        {meal.slice(0, 3)}
-                      </span>
-                      {name ? (
-                        <div className="flex items-start justify-between gap-1 flex-1">
-                          <span className="text-xs font-medium leading-tight line-clamp-2">{name}</span>
+                      {day.slice(0, 3)}
+                    </div>
+                    <div className={`text-2xl font-semibold ${isToday ? "text-primary" : "text-foreground"}`}>
+                      {weekDates[i].getDate()}
+                    </div>
+                  </div>
+                </div>
+
+                <div className="flex-1 border-l border-border/70 divide-y divide-border/50">
+                  {MEALS.map((meal) => {
+                    const id = plan[day]?.[meal];
+                    const name = recipeName(id);
+                    const { icon: Icon, tint, fg } = mealStyles[meal];
+                    return (
+                      <div key={meal} className="flex items-center gap-3 px-3 py-2">
+                        <div className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-xl ${tint}`}>
+                          <Icon className={`h-4 w-4 ${fg}`} />
+                        </div>
+                        <div className="min-w-0 flex-1">
+                          <div className="text-[11px] text-muted-foreground leading-tight">{meal}</div>
+                          {name ? (
+                            <div className="truncate text-sm font-medium leading-tight">{name}</div>
+                          ) : (
+                            <button
+                              onClick={() => {
+                                setEditing({ day, meal });
+                                setSelectedRecipeId("");
+                              }}
+                              className="flex items-center text-muted-foreground hover:text-primary"
+                              aria-label={`Add recipe to ${day} ${meal}`}
+                            >
+                              <Plus className="h-4 w-4" />
+                            </button>
+                          )}
+                        </div>
+                        {name ? (
                           <button
                             onClick={() => clearMeal(day, meal)}
-                            className="text-muted-foreground hover:text-destructive shrink-0"
+                            className="shrink-0 text-muted-foreground hover:text-destructive"
                             aria-label={`Clear ${meal} for ${day}`}
                           >
-                            <X className="h-3 w-3" />
+                            <X className="h-4 w-4" />
                           </button>
-                        </div>
-                      ) : (
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          className="mt-auto justify-start text-muted-foreground h-auto py-0 px-0 min-w-0 w-full"
-                          onClick={() => {
-                            setEditing({ day, meal });
-                            setSelectedRecipeId("");
-                          }}
-                          aria-label={`Add recipe to ${day} ${meal}`}
-                        >
-                          <Plus className="h-3.5 w-3.5" />
-                          <span className="text-[10px] ml-0.5">Add</span>
-                        </Button>
-                      )}
-                    </div>
-                  );
-                })}
-              </div>
-            </Card>
-          ))}
+                        ) : null}
+                        <ChevronRight className="h-4 w-4 shrink-0 text-muted-foreground/50" />
+                      </div>
+                    );
+                  })}
+                </div>
+              </Card>
+            );
+          })}
         </div>
       </div>
 
