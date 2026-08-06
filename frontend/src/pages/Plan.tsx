@@ -74,53 +74,60 @@ const PlanPage = () => {
   const recipeName = (id?: number) => recipes.find((r) => r.id === id)?.title;
 
   return (
-    <div className="mx-auto flex h-dvh w-full flex-col overflow-hidden px-4 max-w-3xl pt-[calc(env(safe-area-inset-top)+1.5rem)]">
-      <h1 className="text-2xl font-bold mb-2">Plan</h1>
-      <h2 className="text-lg font-medium text-muted-foreground mb-6">Weekly Schedule</h2>
+    <div className="mx-auto flex h-dvh w-full flex-col overflow-hidden px-3 max-w-3xl pt-[calc(env(safe-area-inset-top)+1rem)]">
+      <h1 className="text-xl font-bold mb-1">Plan</h1>
+      <h2 className="text-sm font-medium text-muted-foreground mb-3">Weekly Schedule</h2>
 
-      <div className="flex-1 overflow-y-auto min-h-0 overflow-y-contain pb-[calc(6rem+env(safe-area-inset-bottom))] [-webkit-overflow-scrolling:touch]">
-        {DAYS.map((day) => (
-          <Card key={day} className="p-4">
-            <h3 className="font-semibold mb-3">{day}</h3>
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
-              {MEALS.map((meal) => {
-                const id = plan[day]?.[meal];
-                const name = recipeName(id);
-                return (
-                  <div
-                    key={meal}
-                    className="border border-border rounded-md p-3 min-h-[70px] flex flex-col"
-                  >
-                    <span className="text-xs uppercase text-muted-foreground mb-1">{meal}</span>
-                    {name ? (
-                      <div className="flex items-start justify-between gap-2 flex-1">
-                        <span className="text-sm font-medium">{name}</span>
-                        <button
-                          onClick={() => clearMeal(day, meal)}
-                          className="text-muted-foreground hover:text-destructive"
+      <div className="flex-1 min-h-0 overflow-y-auto pb-[calc(5rem+env(safe-area-inset-bottom))] [-webkit-overflow-scrolling:touch]">
+        <div className="flex flex-col gap-2">
+          {DAYS.map((day) => (
+            <Card key={day} className="p-2">
+              <h3 className="text-sm font-semibold leading-none mb-1.5">{day}</h3>
+              <div className="grid grid-cols-3 gap-1.5">
+                {MEALS.map((meal) => {
+                  const id = plan[day]?.[meal];
+                  const name = recipeName(id);
+                  return (
+                    <div
+                      key={meal}
+                      className="border border-border rounded-md p-1.5 min-h-[44px] flex flex-col"
+                    >
+                      <span className="text-[10px] uppercase tracking-wide text-muted-foreground leading-none mb-1">
+                        {meal.slice(0, 3)}
+                      </span>
+                      {name ? (
+                        <div className="flex items-start justify-between gap-1 flex-1">
+                          <span className="text-xs font-medium leading-tight line-clamp-2">{name}</span>
+                          <button
+                            onClick={() => clearMeal(day, meal)}
+                            className="text-muted-foreground hover:text-destructive shrink-0"
+                            aria-label={`Clear ${meal} for ${day}`}
+                          >
+                            <X className="h-3 w-3" />
+                          </button>
+                        </div>
+                      ) : (
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="mt-auto justify-start text-muted-foreground h-auto py-0 px-0 min-w-0 w-full"
+                          onClick={() => {
+                            setEditing({ day, meal });
+                            setSelectedRecipeId("");
+                          }}
+                          aria-label={`Add recipe to ${day} ${meal}`}
                         >
-                          <X className="h-4 w-4" />
-                        </button>
-                      </div>
-                    ) : (
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        className="mt-auto justify-start text-muted-foreground h-auto py-1 px-1"
-                        onClick={() => {
-                          setEditing({ day, meal });
-                          setSelectedRecipeId("");
-                        }}
-                      >
-                        <Plus className="h-4 w-4 mr-1" /> Add recipe
-                      </Button>
-                    )}
-                  </div>
-                );
-              })}
-            </div>
-          </Card>
-        ))}
+                          <Plus className="h-3.5 w-3.5" />
+                          <span className="text-[10px] ml-0.5">Add</span>
+                        </Button>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            </Card>
+          ))}
+        </div>
       </div>
 
       <Dialog open={!!editing} onOpenChange={(o) => !o && setEditing(null)}>
