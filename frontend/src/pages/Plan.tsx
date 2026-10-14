@@ -41,9 +41,9 @@ const weekDates = (() => {
 const todayIndex = (new Date().getDay() + 6) % 7;
 
 const mealStyles: Record<Meal, { icon: typeof Sun; tint: string; fg: string }> = {
-  Breakfast: { icon: Sun, tint: "bg-secondary/15", fg: "text-secondary" },
-  Lunch: { icon: Sun, tint: "bg-primary/10", fg: "text-primary" },
-  Dinner: { icon: Moon, tint: "bg-accent/40", fg: "text-accent-foreground" },
+  Breakfast: { icon: Sun, tint: "bg-meal-morning", fg: "text-meal-icon" },
+  Lunch: { icon: Sun, tint: "bg-meal-midday", fg: "text-meal-icon" },
+  Dinner: { icon: Moon, tint: "bg-meal-evening", fg: "text-meal-icon" },
 };
 
 const loadPlan = (): Plan => {
@@ -119,7 +119,7 @@ const PlanPage = () => {
               <Card
                 key={day}
                 className={`flex overflow-hidden rounded-2xl border-0 shadow-sm ${
-                  isToday ? "bg-primary/10" : "bg-card"
+                  isToday ? "bg-primary/30" : "bg-card"
                 }`}
               >
                 <div className="flex items-center gap-1 pl-2 pr-3 py-3">
@@ -127,12 +127,12 @@ const PlanPage = () => {
                   <div className="w-12 text-center">
                     <div
                       className={`text-[11px] font-semibold uppercase tracking-widest ${
-                        isToday ? "text-primary" : "text-muted-foreground"
+                        isToday ? "text-foreground" : "text-muted-foreground"
                       }`}
                     >
                       {day.slice(0, 3)}
                     </div>
-                    <div className={`text-2xl font-semibold ${isToday ? "text-primary" : "text-foreground"}`}>
+                    <div className="text-2xl font-semibold text-foreground">
                       {weekDates[i].getDate()}
                     </div>
                   </div>

@@ -20,6 +20,16 @@ export default {
 		},
 		extend: {
 			colors: {
+				meal: {
+					morning: 'hsl(var(--meal-morning))',
+					midday: 'hsl(var(--meal-midday))',
+					evening: 'hsl(var(--meal-evening))',
+					icon: 'hsl(var(--meal-icon))'
+				},
+				navigation: {
+					DEFAULT: 'hsl(var(--navigation))',
+					foreground: 'hsl(var(--navigation-foreground))'
+				},
 				border: 'hsl(var(--border))',
 				input: 'hsl(var(--input))',
 				ring: 'hsl(var(--ring))',
