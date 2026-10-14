@@ -1,6 +1,7 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import {
   Dialog,
   DialogContent,
@@ -58,6 +59,9 @@ const PlanPage = () => {
   const { addItem } = useGroceries();
   const { toast } = useToast();
   const [plan, setPlan] = useState<Plan>(loadPlan);
+  const [isAddingItem, setIsAddingItem] = useState(false);
+  const [newItemName, setNewItemName] = useState("");
+  const [name, setName] = useState(false);
   const [editing, setEditing] = useState<{ day: string; meal: Meal } | null>(null);
   const [selectedRecipeId, setSelectedRecipeId] = useState<string>("");
 
@@ -65,6 +69,11 @@ const PlanPage = () => {
     setPlan(next);
     localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
   };
+
+  const handleSaveItem = () => {
+    setIsAddingItem(false);
+    setNewItemName("");
+  }
 
   const assign = () => {
     if (!editing || !selectedRecipeId) return;
@@ -88,6 +97,11 @@ const PlanPage = () => {
     const dayPlan = { ...plan[day] };
     delete dayPlan[meal];
     savePlan({ ...plan, [day]: dayPlan });
+  };
+
+  const handleShowItemInput = () => {
+    setIsAddingItem(true);
+    setNewItemName("");
   };
 
   const recipeName = (id?: number) => recipes.find((r) => r.id === id)?.title;
@@ -127,7 +141,7 @@ const PlanPage = () => {
                 <div className="flex-1 border-l border-border/70 divide-y divide-border/50">
                   {MEALS.map((meal) => {
                     const id = plan[day]?.[meal];
-                    const name = recipeName(id);
+                    // const name = recipeName(id);
                     const { icon: Icon, tint, fg } = mealStyles[meal];
                     return (
                       <div key={meal} className="flex items-center gap-3 px-3 py-2">
@@ -136,20 +150,48 @@ const PlanPage = () => {
                         </div>
                         <div className="min-w-0 flex-1">
                           <div className="text-[11px] text-muted-foreground leading-tight">{meal}</div>
-                          {name ? (
+                          {name &&
                             <div className="truncate text-sm font-medium leading-tight">{name}</div>
-                          ) : (
-                            <button
-                              onClick={() => {
-                                setEditing({ day, meal });
-                                setSelectedRecipeId("");
-                              }}
-                              className="flex items-center text-muted-foreground hover:text-primary"
-                              aria-label={`Add recipe to ${day} ${meal}`}
-                            >
-                              <Plus className="h-4 w-4" />
-                            </button>
-                          )}
+                          }
+                          {isAddingItem && 
+                            <div className="flex items-center space-x-3">
+                              <input
+                                type="checkbox"
+                                disabled
+                                className="w-4 h-4"
+                              />
+
+                              <Input
+                                value={newItemName}
+                                onChange={(event) => setNewItemName(event.target.value)}
+                                onKeyDown={(event) => {
+                                  if (event.key === "Enter") {
+                                    handleSaveItem();
+                                  }
+
+                                  if (event.key === "Escape") {
+                                    setNewItemName("");
+                                    setIsAddingItem(false);
+                                  }
+                                }}
+                                onBlur={handleSaveItem}
+                                placeholder="Ingredient name"
+                                className="h-8 flex-1"
+                                autoFocus
+                              />
+                            </div>
+                          }
+                          {!isAddingItem &&  (
+                              <Button
+                                size="icon"
+                                variant="outline"
+                                className="h-8 w-8 rounded-md border-dashed"
+                                aria-label="Add item"
+                                onClick={handleShowItemInput}
+                              >
+                                <Plus className="h-4 w-4" />
+                              </Button>
+                            )}
                         </div>
                         {name ? (
                           <button
