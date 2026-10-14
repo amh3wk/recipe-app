@@ -185,7 +185,7 @@ const GroceryList = () => {
       <h1 className="text-2xl font-bold mb-2 relative z-10">Grocery List</h1>
       <h2 className="text-lg font-medium text-muted-foreground mb-6 relative z-10">Weekly</h2>
 
-      <Card className="mb-6 liquid-glass relative z-10 bg-secondary/30">
+      <Card className="mb-6 liquid-glass-solid relative z-10">
         <CardHeader>
           <CardTitle className="text-lg">Items</CardTitle>
         </CardHeader>
@@ -259,7 +259,7 @@ const GroceryList = () => {
         </CardContent>
       </Card>
 
-      <Card className="mb-6 liquid-glass relative z-10 bg-accent/30">
+      <Card className="mb-6 liquid-glass-solid relative z-10">
         <CardHeader className="flex flex-row items-center justify-between space-y-0">
           <CardTitle className="text-lg">Recipes</CardTitle>
           <Button size="sm" variant="outline" onClick={() => setRecipeOpen(true)}>

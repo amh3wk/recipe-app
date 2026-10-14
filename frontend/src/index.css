@@ -160,3 +160,22 @@ All colors MUST be HSL.
       inset 0 1px 0 0 hsl(var(--foreground) / 0.08);
   }
 }
+
+@layer components {
+  /* Solid version of the glass card: same opaque fill as the Plan tab's cards. */
+  .liquid-glass-solid {
+    background-color: hsl(var(--card)) !important;
+    border: 1px solid hsl(var(--border) / 0.35) !important;
+    box-shadow:
+      0 8px 32px -8px hsl(var(--foreground) / 0.08),
+      inset 0 1px 0 0 hsl(var(--background) / 0.7);
+  }
+
+  .dark .liquid-glass-solid {
+    background-color: hsl(var(--card)) !important;
+    border-color: hsl(var(--border) / 0.3) !important;
+    box-shadow:
+      0 8px 32px -8px hsl(0 0% 0% / 0.25),
+      inset 0 1px 0 0 hsl(var(--foreground) / 0.08);
+  }
+}
