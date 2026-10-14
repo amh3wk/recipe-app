@@ -13,7 +13,7 @@ const Navigation = () => {
   ];
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 bg-background/40 backdrop-blur-md border-t border-border/30 z-50">
+    <nav className="fixed bottom-[env(safe-area-inset-bottom)] left-3 right-3 mx-auto max-w-3xl rounded-2xl bg-navigation text-navigation-foreground z-50">
       <div className="flex justify-around items-center py-2">
         {navItems.map((item) => {
               const Icon = item.icon;
@@ -24,8 +24,8 @@ const Navigation = () => {
                   key={item.path}
                   to={item.path}
                   className={cn(
-                    "flex flex-col items-center gap-1 py-2 px-4 text-muted-foreground",
-                    isActive && "text-foreground"
+                    "flex flex-col items-center gap-1 py-2 px-4 text-navigation-foreground/70 transition-colors",
+                    isActive && "text-primary"
                   )}
                 >
                   <Icon className="h-6 w-6" />

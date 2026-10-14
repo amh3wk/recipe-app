@@ -9,45 +9,51 @@ All colors MUST be HSL.
 @layer base {
   :root {
     /* Food-themed color palette */
-    --background: 45 100% 98%;
-    --foreground: 160 15% 15%;
+    --background: 43 56% 94%;
+    --foreground: 60 4% 10%;
 
-    --card: 0 0% 100%;
-    --card-foreground: 160 15% 15%;
+    --card: 43 56% 96%;
+    --card-foreground: 60 4% 10%;
 
-    --popover: 0 0% 100%;
-    --popover-foreground: 160 15% 15%;
+    --popover: 43 56% 96%;
+    --popover-foreground: 60 4% 10%;
 
     /* Fresh green primary - like fresh herbs */
-    --primary: 140 65% 35%;
-    --primary-foreground: 0 0% 98%;
-    --primary-hover: 140 65% 30%;
+    --primary: 323 70% 82%;
+    --primary-foreground: 60 4% 10%;
+    --primary-hover: 323 65% 76%;
 
     /* Warm orange secondary - like fresh produce */
-    --secondary: 25 90% 60%;
-    --secondary-foreground: 0 0% 98%;
+    --secondary: 49 89% 72%;
+    --secondary-foreground: 60 4% 10%;
 
     /* Soft cream muted */
-    --muted: 45 60% 95%;
-    --muted-foreground: 160 10% 45%;
+    --muted: 43 25% 89%;
+    --muted-foreground: 60 4% 39%;
 
     /* Light peach accent */
-    --accent: 20 80% 85%;
-    --accent-foreground: 160 15% 15%;
+    --accent: 216 58% 81%;
+    --accent-foreground: 60 4% 10%;
+    --meal-morning: 49 89% 72%;
+    --meal-midday: 79 28% 60%;
+    --meal-evening: 216 58% 81%;
+    --meal-icon: 60 10% 24%;
+    --navigation: 60 4% 8%;
+    --navigation-foreground: 43 25% 89%;
 
     /* Tomato red destructive */
     --destructive: 5 85% 55%;
     --destructive-foreground: 0 0% 98%;
 
     /* Soft borders */
-    --border: 45 30% 88%;
-    --input: 45 30% 88%;
-    --ring: 140 65% 35%;
+    --border: 43 23% 82%;
+    --input: 43 23% 82%;
+    --ring: 323 46% 54%;
 
     /* Custom gradients */
-    --gradient-primary: linear-gradient(135deg, hsl(140 65% 35%), hsl(120 50% 45%));
-    --gradient-secondary: linear-gradient(135deg, hsl(25 90% 60%), hsl(35 85% 65%));
-    --gradient-hero: linear-gradient(135deg, hsl(45 100% 98%), hsl(45 60% 95%));
+    --gradient-primary: linear-gradient(hsl(var(--primary)), hsl(var(--primary)));
+    --gradient-secondary: linear-gradient(hsl(var(--secondary)), hsl(var(--secondary)));
+    --gradient-hero: linear-gradient(hsl(var(--background)), hsl(var(--background)));
 
     --radius: 0.5rem;
 
@@ -72,6 +78,12 @@ All colors MUST be HSL.
   }
 
   .dark {
+    --meal-morning: 49 55% 49%;
+    --meal-midday: 79 25% 44%;
+    --meal-evening: 216 40% 58%;
+    --meal-icon: 60 4% 10%;
+    --navigation: 60 4% 8%;
+    --navigation-foreground: 43 25% 89%;
     --background: 222.2 84% 4.9%;
     --foreground: 210 40% 98%;
 

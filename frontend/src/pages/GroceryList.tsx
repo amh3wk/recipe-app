@@ -181,14 +181,11 @@ const GroceryList = () => {
   // console.log("apiGroceryListRecipes:", apiGroceryListRecipes);
   return (
     <div className="container mx-auto px-4 max-w-2xl relative min-h-screen pt-[calc(env(safe-area-inset-top)+1.5rem)] pb-[calc(env(safe-area-inset-bottom)+6rem)]">
-      <div className="absolute -top-10 -right-20 w-72 h-72 rounded-full bg-secondary/20 blur-3xl pointer-events-none" />
-      <div className="absolute top-40 -left-20 w-80 h-80 rounded-full bg-primary/10 blur-3xl pointer-events-none" />
-      <div className="absolute bottom-40 right-0 w-64 h-64 rounded-full bg-accent/30 blur-3xl pointer-events-none" />
 
       <h1 className="text-2xl font-bold mb-2 relative z-10">Grocery List</h1>
       <h2 className="text-lg font-medium text-muted-foreground mb-6 relative z-10">Weekly</h2>
 
-      <Card className="mb-6 liquid-glass relative z-10">
+      <Card className="mb-6 liquid-glass relative z-10 bg-secondary/30">
         <CardHeader>
           <CardTitle className="text-lg">Items</CardTitle>
         </CardHeader>
@@ -262,7 +259,7 @@ const GroceryList = () => {
         </CardContent>
       </Card>
 
-      <Card className="mb-6 liquid-glass relative z-10">
+      <Card className="mb-6 liquid-glass relative z-10 bg-accent/30">
         <CardHeader className="flex flex-row items-center justify-between space-y-0">
           <CardTitle className="text-lg">Recipes</CardTitle>
           <Button size="sm" variant="outline" onClick={() => setRecipeOpen(true)}>
