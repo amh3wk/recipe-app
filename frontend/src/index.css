@@ -34,9 +34,14 @@ All colors MUST be HSL.
     /* Light peach accent */
     --accent: 216 58% 81%;
     --accent-foreground: 60 4% 10%;
-    --meal-morning: 49 89% 72%;
-    --meal-midday: 79 28% 60%;
-    --meal-evening: 216 58% 81%;
+    /* Meal tints: deep teal, pastel sage, powder blue */
+    --meal-morning: 311.49 56.63% 83.73%;
+    --meal-midday: 73.8 54.04% 68.43%;
+    --meal-evening: 215.38 90.7% 91.57%;
+    /* Icon colors that stay legible on each meal tint */
+    --meal-morning-foreground: 60 10% 24%;
+    --meal-midday-foreground: 60 10% 24%;
+    --meal-evening-foreground: 60 10% 24%;
     --meal-icon: 60 10% 24%;
     --navigation: 60 4% 8%;
     --navigation-foreground: 43 25% 89%;
@@ -78,9 +83,12 @@ All colors MUST be HSL.
   }
 
   .dark {
-    --meal-morning: 49 55% 49%;
-    --meal-midday: 79 25% 44%;
-    --meal-evening: 216 40% 58%;
+    --meal-morning: 311.49 56.63% 83.73%;
+    --meal-midday: 73.8 54.04% 68.43%;
+    --meal-evening: 215.38 90.7% 91.57%;
+    --meal-morning-foreground: 60 10% 24%;
+    --meal-midday-foreground: 60 10% 24%;
+    --meal-evening-foreground: 60 10% 24%;
     --meal-icon: 60 4% 10%;
     --navigation: 60 4% 8%;
     --navigation-foreground: 43 25% 89%;

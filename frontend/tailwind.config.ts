@@ -22,8 +22,11 @@ export default {
 			colors: {
 				meal: {
 					morning: 'hsl(var(--meal-morning))',
+					'morning-foreground': 'hsl(var(--meal-morning-foreground))',
 					midday: 'hsl(var(--meal-midday))',
+					'midday-foreground': 'hsl(var(--meal-midday-foreground))',
 					evening: 'hsl(var(--meal-evening))',
+					'evening-foreground': 'hsl(var(--meal-evening-foreground))',
 					icon: 'hsl(var(--meal-icon))'
 				},
 				navigation: {
