@@ -41,9 +41,9 @@ const weekDates = (() => {
 const todayIndex = (new Date().getDay() + 6) % 7;
 
 const mealStyles: Record<Meal, { icon: typeof Sun; tint: string; fg: string }> = {
-  Breakfast: { icon: Sun, tint: "bg-meal-morning", fg: "text-meal-icon" },
-  Lunch: { icon: Sun, tint: "bg-meal-midday", fg: "text-meal-icon" },
-  Dinner: { icon: Moon, tint: "bg-meal-evening", fg: "text-meal-icon" },
+  Breakfast: { icon: Sun, tint: "bg-meal-morning", fg: "text-meal-morning-foreground" },
+  Lunch: { icon: Sun, tint: "bg-meal-midday", fg: "text-meal-midday-foreground" },
+  Dinner: { icon: Moon, tint: "bg-meal-evening", fg: "text-meal-evening-foreground" },
 };
 
 const loadPlan = (): Plan => {
