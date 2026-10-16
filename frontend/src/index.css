@@ -35,9 +35,9 @@ All colors MUST be HSL.
     --accent: 216 58% 81%;
     --accent-foreground: 60 4% 10%;
     /* Meal tints: deep teal, pastel sage, powder blue */
-    --meal-morning: 182 97% 11%;
-    --meal-midday: 74 54% 68%;
-    --meal-evening: 215 91% 92%;
+    --meal-morning: 182.12 96.55% 11.37%;
+    --meal-midday: 73.8 54.04% 68.43%;
+    --meal-evening: 215.38 90.7% 91.57%;
     /* Icon colors that stay legible on each meal tint */
     --meal-morning-foreground: 43 56% 96%;
     --meal-midday-foreground: 60 10% 24%;
@@ -83,9 +83,9 @@ All colors MUST be HSL.
   }
 
   .dark {
-    --meal-morning: 182 97% 11%;
-    --meal-midday: 74 54% 68%;
-    --meal-evening: 215 91% 92%;
+    --meal-morning: 182.12 96.55% 11.37%;
+    --meal-midday: 73.8 54.04% 68.43%;
+    --meal-evening: 215.38 90.7% 91.57%;
     --meal-morning-foreground: 43 56% 96%;
     --meal-midday-foreground: 60 10% 24%;
     --meal-evening-foreground: 60 10% 24%;
