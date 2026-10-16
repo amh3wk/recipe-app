@@ -1,4 +1,4 @@
 # Roadmap
 
-- [ ] Plan tab: Breakfast/Lunch/Dinner icon circles set to #013739, #C6DA83, #D6E6FD — verify exact render
-- [ ] Plan tab: Breakfast icon circle changed to #EDBEE4
+- [x] Plan tab: Breakfast/Lunch/Dinner icon circles set to requested hex codes (verified exact render)
+- [x] Plan tab: Breakfast icon circle changed to #EDBEE4
